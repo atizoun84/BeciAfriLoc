@@ -1,11 +1,7 @@
 {
-  "name": "SmartLoc - Gestion Locative",
   "short_name": "SmartLoc",
-  "description": "Application de gestion immobilière et comptabilité par Plateny AMOUSSOU",
-  "start_url": "index.html",
-  "display": "standalone",
-  "background_color": "#003366",
-  "theme_color": "#003366",
+  "name": "SmartLoc – Gestion Immobilière",
+  "description": "Application de gestion de locations et comptabilité",
   "icons": [
     {
       "src": "logoapp.png",
@@ -19,5 +15,9 @@
       "type": "image/png",
       "purpose": "any maskable"
     }
-  ]
+  ],
+  "start_url": "./index.html",
+  "display": "standalone",
+  "theme-color": "#003366",
+  "background-color": "#f0f2f5"
 }

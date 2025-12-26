@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmartLoc - Connexion</title>
+  
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#003366">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="SmartLoc">
+  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/609/609803.png">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f0f2f5;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    .login-card {
+      width: 100%;
+      max-width: 400px;
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      border-top: 5px solid #003366;
+    }
+    .brand-logo {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+    .brand-logo img {
+      max-height: 80px;
+    }
+    .btn-primary {
+      background-color: #003366;
+      border: none;
+      padding: 12px;
+      font-weight: bold;
+    }
+    .btn-primary:hover {
+      background-color: #002244;
+    }
+    .form-control:focus, .form-select:focus {
+      border-color: #003366;
+      box-shadow: 0 0 0 0.25rem rgba(0, 51, 102, 0.25);
+    }
+    .error-msg {
+      color: #dc3545;
+      font-size: 0.9rem;
+      text-align: center;
+      margin-top: 10px;
+      display: none;
+    }
+    footer {
+      position: absolute;
+      bottom: 20px;
+      font-size: 0.8rem;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-card">
+    <div class="brand-logo">
+      <img src="logo.png" alt="SmartLoc Logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/609/609803.png'">
+      <h3 class="mt-3 fw-bold" style="color: #003366;">SmartLoc</h3>
+      <p class="text-muted small">Gestion Immobilière Intelligente</p>
+    </div>
+
+    <form id="loginForm">
+      <div class="mb-3">
+        <label class="form-label fw-bold">Sélectionner un utilisateur</label>
+        <select id="userSelect" class="form-select" required>
+            <option value="" disabled selected>-- Choisir un compte --</option>
+            </select>
+      </div>
+      <div class="mb-4">
+        <label class="form-label fw-bold">Mot de passe</label>
+        <input type="password" id="password" class="form-control" placeholder="••••••••" required>
+      </div>
+      <div class="d-grid">
+        <button type="submit" class="btn btn-primary">Se connecter</button>
+      </div>
+      <div id="errorMsg" class="error-msg">Mot de passe incorrect pour cet utilisateur.</div>
+    </form>
+  </div>
+
+  <footer>
+    Conçu par <strong>Atizoun Plateny AMOUSSOU</strong>
+  </footer>
+
+  <script>
+    window.onload = function() {
+      // Si déjà connecté, rediriger
+      if (localStorage.getItem('smartloc_session')) {
+        window.location.href = 'gestion.html';
+        return;
+      }
+      chargerListeUtilisateurs();
+    };
+
+    function chargerListeUtilisateurs() {
+      const select = document.getElementById('userSelect');
+      const params = JSON.parse(localStorage.getItem('smartloc_params')) || {};
+      const users = JSON.parse(localStorage.getItem('smartloc_users')) || [];
+
+      // 1. Ajouter le PDG (Admin) s'il est configuré
+      if (params.pdgNom) {
+        const opt = document.createElement('option');
+        opt.value = "ADMIN_PDG";
+        opt.textContent = `⭐ ${params.pdgNom} (PDG)`;
+        opt.dataset.pass = params.adminPass || "admin";
+        opt.dataset.realname = params.pdgNom;
+        opt.dataset.role = "admin";
+        select.appendChild(opt);
+      } else {
+        // Mode secours si rien n'est paramétré
+        const opt = document.createElement('option');
+        opt.value = "ADMIN_DEFAULT";
+        opt.textContent = "⭐ Administrateur (Défaut)";
+        opt.dataset.pass = "admin";
+        opt.dataset.realname = "Administrateur";
+        opt.dataset.role = "admin";
+        select.appendChild(opt);
+      }
+
+      // 2. Ajouter les agents configurés
+      users.forEach(u => {
+        const opt = document.createElement('option');
+        opt.value = u.id;
+        opt.textContent = `👤 Agent : ${u.id}`;
+        opt.dataset.pass = u.pass;
+        opt.dataset.realname = u.id;
+        opt.dataset.role = "agent";
+        select.appendChild(opt);
+      });
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const select = document.getElementById('userSelect');
+      const selectedOpt = select.options[select.selectedIndex];
+      const passIn = document.getElementById('password').value;
+      const errorMsg = document.getElementById('errorMsg');
+
+      if (!selectedOpt.value) return;
+
+      const correctPass = selectedOpt.dataset.pass;
+
+      if (passIn === correctPass) {
+        // Créer la session
+        const session = {
+          nom: selectedOpt.dataset.realname,
+          role: selectedOpt.dataset.role,
+          id: selectedOpt.value,
+          loginTime: new Date().getTime()
+        };
+        localStorage.setItem('smartloc_session', JSON.stringify(session));
+
+        // Redirection
+        window.location.href = 'gestion.html';
+      } else {
+        errorMsg.style.display = 'block';
+        setTimeout(() => { errorMsg.style.display = 'none'; }, 3000);
+      }
+    });
+  </script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('Service Worker enregistré avec succès !', reg))
+          .catch(err => console.log('Échec de l\'enregistrement du Service Worker', err));
+      });
+    }
+  </script>
+
+</body>
+</html>

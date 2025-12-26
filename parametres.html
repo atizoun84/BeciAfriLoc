@@ -276,7 +276,7 @@
 
       let params = JSON.parse(localStorage.getItem('smartloc_params')) || {};
       params.pdgNom = document.getElementById('nomPDG').value;
-      params.adminPass = document.getElementById('adminPass').value; 
+      params.adminPass = document.getElementById('adminPass').value;
       
       if(currentSignatureBase64) params.pdgSig = currentSignatureBase64;
       
@@ -337,7 +337,7 @@
       tempUsers = users;
 
       if(params.pdgNom) document.getElementById('nomPDG').value = params.pdgNom;
-      if(params.adminPass) document.getElementById('adminPass').value = params.adminPass; 
+      if(params.adminPass) document.getElementById('adminPass').value = params.adminPass;
       if(params.pdgSig) {
         currentSignatureBase64 = params.pdgSig;
         const img = document.getElementById('previewSigPDG');
@@ -394,12 +394,8 @@
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js')
-          .then(registration => {
-            console.log('Service Worker enregistré avec succès :', registration.scope);
-          })
-          .catch(error => {
-            console.log('Échec de l\'enregistrement du Service Worker :', error);
-          });
+          .then(reg => console.log('Service Worker enregistré !', reg))
+          .catch(err => console.log('Erreur d\'enregistrement du Service Worker', err));
       });
     }
   </script>

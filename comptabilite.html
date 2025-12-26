@@ -16,9 +16,6 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   
   <style>
-    /* Empêcher le flash du contenu avant la vérification du mot de passe */
-    #mainContent { display: none; }
-
     body {
       background-color: #f0f2f5;
       font-family: 'Segoe UI', sans-serif;
@@ -274,29 +271,6 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    // --- VERIFICATION DU MOT DE PASSE ADMIN ---
-    function verifierAccesAdmin() {
-        const params = JSON.parse(localStorage.getItem('smartloc_params')) || {};
-        const passwordCorrect = params.adminPass || ""; // Mot de passe défini en paramètres
-
-        if (passwordCorrect === "") {
-            alert("Aucun mot de passe Administrateur n'a été défini dans les paramètres. Accès libre autorisé (Veuillez configurer un mot de passe dans Paramètres pour sécuriser cette page).");
-            document.getElementById('mainContent').style.display = 'block';
-            chargerBiens();
-            return;
-        }
-
-        const saisie = prompt("Cette section est réservée au PDG. Veuillez entrer le mot de passe Administrateur :");
-
-        if (saisie === passwordCorrect) {
-            document.getElementById('mainContent').style.display = 'block';
-            chargerBiens();
-        } else {
-            alert("Mot de passe incorrect. Redirection vers le tableau de bord.");
-            window.location.href = "index.html";
-        }
-    }
-
     const selectBien = document.getElementById('selectBien');
     const selectBienConfigure = document.getElementById('selectBienConfigure');
     const btnOuvrirModale = document.getElementById('btnOuvrirModale');
@@ -506,16 +480,15 @@
       }, 1500);
     });
 
-    // Lancement de la vérification au chargement
-    window.onload = verifierAccesAdmin;
+    window.onload = chargerBiens;
   </script>
 
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js')
-          .then(reg => console.log('Service Worker enregistré ! Portée :', reg.scope))
-          .catch(err => console.log('Échec de l’enregistrement du Service Worker :', err));
+          .then(reg => console.log('SW enregistré !', reg))
+          .catch(err => console.log('Échec SW', err));
       });
     }
   </script>
